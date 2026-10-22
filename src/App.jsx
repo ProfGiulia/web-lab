@@ -54,25 +54,70 @@ function App() {
   const checks = selected && work ? selected.requirements.map(req => {
     const html = work.html || '', css = work.css || ''
     let ok = false
-    const countTag = (src, tag) => (src.match(new RegExp(`<${tag}(?:\\\\s|>)`, 'gi')) || []).length
-    const stripped = html.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'')
-    switch(req.type) {
-      case 'html': ok = req.pattern === 'doctype' ? /<!doctype\\s+html/i.test(html) : /<!--[\\s\\S]*?-->/m.test(html); break
-      case 'tag': ok = new RegExp(`<${req.value}(?:\\\\s|>)`, 'i').test(stripped); break
-      case 'countTag': ok = countTag(stripped, req.value) >= req.count; break
-      case 'allAlt': { const imgs = [...stripped.matchAll(/<img\\b[^>]*>/gi)].map(m=>m[0]); ok = imgs.length > 0 && imgs.every(x => /\\balt\\s*=\\s*(['"])[^'"]+\\1/i.test(x)); break }
-      case 'internalLinks': { const links = [...stripped.matchAll(/<a\\b[^>]*href\\s*=\\s*(['"])#([^'"]+)\\1/gi)]; ok = links.length >= req.count && links.every(m => new RegExp(`\\\\bid\\\\s*=\\\\s*(['"])${m[2]}\\\\1`, 'i').test(stripped)); break }
-      case 'externalLink': ok = /<a\b[^>]*href\s*=\s*(['"])https?:\/\//i.test(stripped); break      
-      case 'idExists': ok = new RegExp(`\\\\bid\\\\s*=\\\\s*(['"])${req.value}\\\\1`, 'i').test(stripped); break
-      case 'cssNonEmpty': ok = css.trim().length > 0; break
-      case 'cssSelector': ok = new RegExp(`(^|})\\\\s*${req.value.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')}\\\\s*\\\\{`, 'm').test(css); break
-      case 'cssProperty': ok = new RegExp(`(?:^|[;{])\\\\s*${req.value}\\\\s*:`, 'i').test(css); break
-      case 'htmlContains': ok = html.toLowerCase().includes(req.value.toLowerCase()); break
-      case 'cssContains': ok = css.includes(req.value); break
-      case 'textContains': ok = stripped.replace(/<[^>]+>/g,' ').toLowerCase().includes(req.value.toLowerCase()); break
-      case 'linkHref': ok = /<a\\b[^>]*href\\s*=/i.test(stripped); break
-      case 'basicClose': ok = /<h1\\b[^>]*>[\\s\\S]*?<\\/h1>/i.test(stripped) && /<p\\b[^>]*>[\\s\\S]*?<\\/p>/i.test(stripped); break
-      default: ok = false
+    const countTag = (src, tag) =>
+      (src.match(new RegExp(`<${tag}(?:\\s|>)`, 'gi')) || []).length
+    const stripped = html
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+
+    switch (req.type) {
+      case 'html':
+        ok = req.pattern === 'doctype'
+          ? /<!doctype\s+html/i.test(html)
+          : /<!--[\s\S]*?-->/m.test(html)
+        break
+      case 'tag':
+        ok = new RegExp(`<${req.value}(?:\\s|>)`, 'i').test(stripped)
+        break
+      case 'countTag':
+        ok = countTag(stripped, req.value) >= req.count
+        break
+      case 'allAlt': {
+        const imgs = [...stripped.matchAll(/<img\b[^>]*>/gi)].map(m => m[0])
+        ok = imgs.length > 0 && imgs.every(x => /\balt\s*=\s*(['"])[^'"]+\1/i.test(x))
+        break
+      }
+      case 'internalLinks': {
+        const links = [...stripped.matchAll(/<a\b[^>]*href\s*=\s*(['"])#([^'"]+)\1/gi)]
+        ok = links.length >= req.count && links.every(m =>
+          new RegExp(`\\bid\\s*=\\s*(['"])${m[2]}\\1`, 'i').test(stripped)
+        )
+        break
+      }
+      case 'externalLink':
+        ok = /<a\b[^>]*href\s*=\s*(['"])https?:\/\//i.test(stripped)
+        break
+      case 'idExists':
+        ok = new RegExp(`\\bid\\s*=\\s*(['"])${req.value}\\1`, 'i').test(stripped)
+        break
+      case 'cssNonEmpty':
+        ok = css.trim().length > 0
+        break
+      case 'cssSelector': {
+        const selector = req.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        ok = new RegExp(`(^|})\\s*${selector}\\s*\\{`, 'm').test(css)
+        break
+      }
+      case 'cssProperty':
+        ok = new RegExp(`(?:^|[;{])\\s*${req.value}\\s*:`, 'i').test(css)
+        break
+      case 'htmlContains':
+        ok = html.toLowerCase().includes(req.value.toLowerCase())
+        break
+      case 'cssContains':
+        ok = css.includes(req.value)
+        break
+      case 'textContains':
+        ok = stripped.replace(/<[^>]+>/g, ' ').toLowerCase().includes(req.value.toLowerCase())
+        break
+      case 'linkHref':
+        ok = /<a\b[^>]*href\s*=/i.test(stripped)
+        break
+      case 'basicClose':
+        ok = /<h1\b[^>]*>[\s\S]*?<\/h1>/i.test(stripped) && /<p\b[^>]*>[\s\S]*?<\/p>/i.test(stripped)
+        break
+      default:
+        ok = false
     }
     return { ...req, ok }
   }) : []
