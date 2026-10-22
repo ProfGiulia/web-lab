@@ -62,7 +62,7 @@ function App() {
       case 'countTag': ok = countTag(stripped, req.value) >= req.count; break
       case 'allAlt': { const imgs = [...stripped.matchAll(/<img\\b[^>]*>/gi)].map(m=>m[0]); ok = imgs.length > 0 && imgs.every(x => /\\balt\\s*=\\s*(['"])[^'"]+\\1/i.test(x)); break }
       case 'internalLinks': { const links = [...stripped.matchAll(/<a\\b[^>]*href\\s*=\\s*(['"])#([^'"]+)\\1/gi)]; ok = links.length >= req.count && links.every(m => new RegExp(`\\\\bid\\\\s*=\\\\s*(['"])${m[2]}\\\\1`, 'i').test(stripped)); break }
-      case 'externalLink': ok = /<a\\b[^>]*href\\s*=\\s*(['"])https?:\\/\\//i.test(stripped); break
+      case 'externalLink': ok = /<a\b[^>]*href\s*=\s*(['"])https?:\/\//i.test(stripped); break      
       case 'idExists': ok = new RegExp(`\\\\bid\\\\s*=\\\\s*(['"])${req.value}\\\\1`, 'i').test(stripped); break
       case 'cssNonEmpty': ok = css.trim().length > 0; break
       case 'cssSelector': ok = new RegExp(`(^|})\\\\s*${req.value.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')}\\\\s*\\\\{`, 'm').test(css); break
