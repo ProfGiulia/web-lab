@@ -55,7 +55,7 @@ function App() {
     const html = work.html || '', css = work.css || ''
     let ok = false
     const countTag = (src, tag) => (src.match(new RegExp(`<${tag}(?:\\\\s|>)`, 'gi')) || []).length
-    const stripped = html.replace(/<style[\\s\\S]*?<\\/style>/gi,'').replace(/<script[\\s\\S]*?<\\/script>/gi,'')
+    const stripped = html.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'')
     switch(req.type) {
       case 'html': ok = req.pattern === 'doctype' ? /<!doctype\\s+html/i.test(html) : /<!--[\\s\\S]*?-->/m.test(html); break
       case 'tag': ok = new RegExp(`<${req.value}(?:\\\\s|>)`, 'i').test(stripped); break
