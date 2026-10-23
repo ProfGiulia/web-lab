@@ -4,8 +4,13 @@ import { sections, exercises } from './exercises.js'
 const initialProgress = () => {
   try { return JSON.parse(localStorage.getItem('weblab-progress') || '{}') } catch { return {} }
 }
-const starterFor = (ex) => ({ html: ex.html, css: ex.css || '', updated: Date.now(), submitted: false })
-const esc = (s) => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')
+const starterFor = () => ({
+  html: '<!doctype html>\n<html lang="it">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>La mia pagina</title>\n</head>\n<body>\n  <!-- Scrivi qui il tuo HTML -->\n</body>\n</html>',
+  css: '',
+  updated: Date.now(),
+  submitted: false
+})
+  const esc = (s) => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')
 
 function makePreview(html, css) {
   const cssTag = css ? `<style>${css.replace(/<\/style/gi, '<\\/style')}</style>` : ''
