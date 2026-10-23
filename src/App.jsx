@@ -129,11 +129,18 @@ function App() {
   const requiredChecks = checks.filter(c => c.ok).length
   const complete = checks.length > 0 && checks.every(c => c.ok)
   const statusFor = (id) => {
-    const p = progress[id]
-    if (p?.submitted) return 'Completato'
-    if (p && ((p.html && p.html !== allExercises.find(e=>e.id===id)?.html) || (p.css && p.css !== (allExercises.find(e=>e.id===id)?.css || '')))) return 'In corso'
-    return 'Da iniziare'
-  }
+  const p = progress[id]
+  if (p?.submitted) return 'Completato'
+
+  const initial = starterFor().html
+
+  if (p && (
+    (p.html && p.html !== initial) ||
+    (p.css && p.css.trim() !== '')
+  )) return 'In corso'
+
+  return 'Da iniziare'
+}
   const download = (filename, content, type='text/html;charset=utf-8') => {
     const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob)
     const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url)
